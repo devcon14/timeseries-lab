@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 # import seaborn as sns
 from matplotlib import pyplot as plt
+DATAFOLDER = "data"
 
 
 # get BTC
@@ -17,12 +18,10 @@ def get_btc(timeframe="hourly"):
     # timeframe = "daily"
     # timeframe = "hourly"
     if timeframe == "hourly":
-        df = pd.read_csv("Bitstamp_BTCUSD_1h.csv")
+        df = pd.read_csv(f"{DATAFOLDER}/Bitstamp_BTCUSD_1h.csv")
         df["Date"] = df.Date.map(lambda x: x[:13] + ":00 " + x[14:])
     elif timeframe == "daily":
-        df = pd.read_csv("Bitstamp_BTCUSD_d.csv")
-    else:
-        raise
+        df = pd.read_csv(f"{DATAFOLDER}/Bitstamp_BTCUSD_d.csv")
     return df
 
 def get_oil():
@@ -34,19 +33,19 @@ def get_oil():
     # FRED-OILPRICE, Spot Oil Price: West Texas Intermediate
     # FRED-IPG211111CSQ, Industrial production crude oil mining
     # FRED-MCOILBRENTEU, Crude Oil Prices: Brent - Europe
-    df = pd.read_csv("CHRIS-CME_CL1.csv")
+    df = pd.read_csv(f"{DATAFOLDER}/CHRIS-CME_CL1.csv")
     df["Close"] = df.Last
     return df
 
 # get hogs
 def get_hogs():
-    df = pd.read_csv("CHRIS-CME_LN1.csv")
+    df = pd.read_csv(f"{DATAFOLDER}/CHRIS-CME_LN1.csv")
     df["Close"] = df.Last
     return df
 
 def get_hogs_spread():
-    df1 = pd.read_csv("CHRIS-CME_LN1.csv")
-    df2 = pd.read_csv("CHRIS-CME_LN2.csv")
+    df1 = pd.read_csv(f"{DATAFOLDER}/CHRIS-CME_LN1.csv")
+    df2 = pd.read_csv(f"{DATAFOLDER}/CHRIS-CME_LN2.csv")
     df1["Close"] = df1.Last - df2.Last
     return df1
 
@@ -59,23 +58,23 @@ def get_corn_futures():
     pass
 
 def get_corn():
-    df = pd.read_csv("corn-prices-historical-chart-data.csv")
+    df = pd.read_csv(f"{DATAFOLDER}/corn-prices-historical-chart-data.csv")
     df = df.rename(columns={"date": "Date", " value": "Close"})
     return df
 
 def get_wheat():
-    df = pd.read_csv("wheat-prices-historical-chart-data.csv")
+    df = pd.read_csv(f"{DATAFOLDER}/wheat-prices-historical-chart-data.csv")
     df = df.rename(columns={"date": "Date", " value": "Close"})
     return df
 
 def get_quandl(name):
     if "CHRIS" in name:
         filename = name.replace("/", "-") + ".csv"
-        df = pd.read_csv(filename)
+        df = pd.read_csv(f"{DATAFOLDER}/" + filename)
         df["Close"] = df.Last
     if "MULTPL" in name:
         filename = name.replace("/", "-") + ".csv"
-        df = pd.read_csv(filename)
+        df = pd.read_csv(f"{DATAFOLDER}/" + filename)
         df = df.rename(columns={"Value": "Close"})
     return df
 
@@ -83,17 +82,17 @@ def get_quandl(name):
 def compile_dataset(dataset):
     # hardcode some macrotrends.net
     if dataset == "sp500-10-year-daily-chart.csv":
-        df = pd.read_csv("macrotrends/" + dataset, skiprows=15)
+        df = pd.read_csv(f"{DATAFOLDER}/macrotrends/" + dataset, skiprows=15)
         df = df.rename(columns={"date": "Date", " value": "Close"})
     elif dataset == "bytetree_1d_bitcoin.csv":
-        df = pd.read_csv(dataset)
+        df = pd.read_csv(f"{DATAFOLDER}/" + dataset)
         # df = pd.read_csv("bytetree_1d_bitcoin.csv")
         # df = pd.read_csv("bitcoin.csv")
         # time, t1v|d1v (first Spend|USD), hgt (block height), dif (difficulty), gen (coins generated)
         # txv (transaction value)
         df = df.rename(columns={"date": "Date", "dpr": "Close"})
     elif dataset == "bytetree_1h_bitcoin.csv":
-        df = pd.read_csv(dataset)
+        df = pd.read_csv(f"{DATAFOLDER}/" + dataset)
         df["Date"] = pd.to_datetime(df.date + ' ' + df.time)
         df = df.rename(columns={"dpr": "Close"})
     elif dataset == "Bitstamp_BTCUSD_1h.csv":

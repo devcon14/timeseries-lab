@@ -1,4 +1,5 @@
 import pandas as pd
+DATAFOLDER = "data"
 
 def normalise_data(data):
     import numpy as np
@@ -15,6 +16,13 @@ def detrend(x):
     x_notrend = x - p[0] * t        # detrended x
     return x_notrend
 
+def add_stationary(df, col):
+    # [definition and log method](https://www.analyticsvidhya.com/blog/2018/09/non-stationary-time-series-python/)
+    import numpy as np
+    df["Logx"] = np.log(df[col])
+    df["Stationary"] = df["Logx"] - df["Logx"].shift(1)
+    del df["Logx"]
+
 def preprocess_frame(df):
     df["Date"] = pd.to_datetime(df.Date)
     df = df.set_index("Date")
@@ -28,6 +36,7 @@ def preprocess_frame(df):
     df["AbsPercentChange"] = abs(df.Close.pct_change(1))
     df["DeTrend"] = detrend(df.Close)
     df["Normalised"] = normalise_data(df.Close)
+    add_stationary(df, "Value")
 
     df['Year'] = df.index.year
     df['Month'] = df.index.month
