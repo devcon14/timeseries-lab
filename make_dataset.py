@@ -76,6 +76,10 @@ def get_quandl(name):
         filename = name.replace("/", "-") + ".csv"
         df = pd.read_csv(f"{DATAFOLDER}/" + filename)
         df = df.rename(columns={"Value": "Close"})
+    if "BCB" in name:
+        filename = name.replace("/", "-") + ".csv"
+        df = pd.read_csv(f"{DATAFOLDER}/" + filename)
+        df = df.rename(columns={"Value": "Close"})
     return df
 
 # or prep_dataset
@@ -103,10 +107,13 @@ def compile_dataset(dataset):
         df = get_quandl(dataset)
     elif "MULTPL" in dataset:
         df = get_quandl(dataset)
+    elif "BCB" in dataset:
+        df = get_quandl(dataset)
 
     from preprocess import preprocess_frame
     df = preprocess_frame(df)
-    df.to_csv("DATASET.CSV")
+    # df.to_csv("DATASET.CSV")
+    df.to_csv("dataset.csv", index=False)
 
     '''
     from matplotlib import pyplot as pl
@@ -155,8 +162,10 @@ if __name__ == "__main__":
     SOURCE = "BTC"
     # compile_old(SOURCE)
 
-    compile_dataset("sp500-10-year-daily-chart.csv")
+    # compile_dataset("sp500-10-year-daily-chart.csv")
     # compile_dataset("CHRIS/CME_SP1")
     # compile_dataset("MULTPL/SP500_REAL_PRICE_MONTH")
     # compile_dataset("bytetree_1d_bitcoin.csv")
+    # compile_dataset("Bitstamp_BTCUSD_1h.csv")
+    compile_dataset("BCB/UDJIAD1")
     # compile_dataset("CDD Bitstamp Hourly")

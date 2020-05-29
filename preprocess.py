@@ -24,10 +24,15 @@ def add_stationary(df, col):
     del df["Logx"]
 
 def preprocess_frame(df):
-    df["Date"] = pd.to_datetime(df.Date)
-    df = df.set_index("Date")
+    # DATE_COLUMN = "date"
+    DATE_COLUMN = "Date"
+
+    # df[DATE_COLUMN] = pd.to_datetime(df[DATE_COLUMN])
+    df["Datestamp"] = pd.to_datetime(df[DATE_COLUMN])
+    # df = df.set_index(DATE_COLUMN)
     # ensure dates in ascending order, oldest first
-    df = df.sort_values(by="Date", ascending=True)
+    df = df.sort_values(by="Datestamp", ascending=True)
+
     if "High" in df.columns:
         df["Range"] = df.High - df.Low
     df["Value"] = df["Close"]
@@ -38,21 +43,31 @@ def preprocess_frame(df):
     df["Normalised"] = normalise_data(df.Close)
     add_stationary(df, "Value")
 
-    df['Year'] = df.index.year
-    df['Month'] = df.index.month
-    df['Doy'] = df.index.dayofyear
-    # df['Dom'] = df.index.day
-    df['Week'] = df.index.week
-    # df['Dow'] = df.index.weekday_name
+    df['Year'] = df.Datestamp.dt.year
+    df['Month'] = df.Datestamp.dt.month
+    df['Doy'] = df.Datestamp.dt.dayofyear
+    df['Dom'] = df.Datestamp.dt.day
+    df['Week'] = df.Datestamp.dt.week
+    # df['Dow'] = df.Datestamp.dt.weekday_name
+    df["Dow"] = df.Datestamp.dt.dayofweek
     # long name for Dow
-    df['DayName'] = df.index.day_name()
-    df['Hour'] = df.index.hour
+    df['DayName'] = df.Datestamp.dt.day_name()
+    df['Hour'] = df.Datestamp.dt.hour
+    # use lowercase for postgresql/timescaledb
+    df.columns = [x.lower() for x in df.columns]
+    return df
+
+
+def load_frame():
+    df = pd.read_csv("dataset.csv")
+    df.index = pd.DatetimeIndex(df.datestamp)
+    df.index.name = "datestampindex"
     return df
 
 
 if __name__ == "__main__":
     # df = pd.read_csv("DATASET.CSV", parse_dates=True, index_col="Date")
-    df = pd.read_csv("DATASET.CSV")
+    df = pd.read_csv("dataset.csv")
     df = preprocess_frame(df)
     print(df.head())
-    df.to_csv("DATASET.CSV")
+    df.to_csv("dataset.csv")
