@@ -4,6 +4,8 @@ import plotly.graph_objects as go
 
 
 def plot_backtest(df):
+    DATEFIELD = "Date"
+    DATEFIELD = "datestamp"
     # my method
     if "BUY" in df.columns:
         df['Holdings'] = np.where(df['BUY'], 1, None)
@@ -11,7 +13,7 @@ def plot_backtest(df):
         df['Holdings'] = np.where(df['SELL'], -1, df['Holdings'])
     df.Holdings = df.Holdings.fillna(method="ffill")
     # df.Holdings = df.Holdings.cumsum()
-    df['Rets'] = df.Holdings * df.PercentChange
+    df['Rets'] = df.Holdings * df.percentchange
     # print (df.Holdings)
 
     # returns = df['Rets'].dropna().cumsum()
@@ -20,18 +22,18 @@ def plot_backtest(df):
     # import plotly.express as px
     # fig = make_subplots(rows=2, cols=2, shared_xaxes=True)
     fig_a = go.Figure()
-    fig_a.add_scatter(x=df.Date, y=df.Holdings, name="Holdings")
-    fig_a.add_scatter(x=df.Date, y=returns, name="Returns")
+    fig_a.add_scatter(x=df[DATEFIELD], y=df.Holdings, name="Holdings")
+    fig_a.add_scatter(x=df[DATEFIELD], y=returns, name="Returns")
 
     fig_b = go.Figure()
-    fig_b.add_scatter(x=df.Date, y=df.Close, mode="lines", name="Close")
+    fig_b.add_scatter(x=df[DATEFIELD], y=df.close, mode="lines", name="Close")
     # fig.add_scatter(x=df.Date, y=df.MA, mode="lines", name="MA", row=2, col=1)
     if "BUY" in list(df.columns):
         buys = df[df.BUY]
-        fig_b.add_scatter(x=buys.Date, y=buys.Close, mode="markers", marker=dict(size=10, symbol=5, color="green"), name="Buys")
+        fig_b.add_scatter(x=buys[DATEFIELD], y=buys.close, mode="markers", marker=dict(size=10, symbol=5, color="green"), name="Buys")
     if "SELL" in list(df.columns):
         sells = df[df.SELL]
-        fig_b.add_scatter(x=sells.Date, y=sells.Close, mode="markers", marker=dict(size=10, symbol=6, color="red"), name="Sells")
+        fig_b.add_scatter(x=sells[DATEFIELD], y=sells.close, mode="markers", marker=dict(size=10, symbol=6, color="red"), name="Sells")
     fig_b.update_yaxes(type="log")
     # fig.update_yaxes(type="log", row=2, col=1)
     # fig.update_layout(yaxis_type="log", row=2, col=1)
@@ -66,7 +68,7 @@ if __name__ == "__main__":
 
     # st_ma(df)
     st_buy_hold(df)
-    df["PercentChange"] = df.Close.pct_change()
+    df["percentchange"] = df.close.pct_change()
     fig_a, fig_b = plot_backtest(df)
     # fig = make_subplots(rows=2, cols=2, shared_xaxes=True)
     fig_a.show()

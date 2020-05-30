@@ -3,7 +3,8 @@ DATAFOLDER = "data"
 
 def normalise_data(data):
     import numpy as np
-    #normalize, do we need to normalize?
+    # data = np.linalg.norm(data)
+    # normalize, do we need to normalize?
     data = (data - np.mean(data)) / np.std(data)
     return data
 
@@ -40,7 +41,6 @@ def preprocess_frame(df):
     df["PercentChange"] = df.Close.pct_change(1)
     df["AbsPercentChange"] = abs(df.Close.pct_change(1))
     df["DeTrend"] = detrend(df.Close)
-    df["Normalised"] = normalise_data(df.Close)
     add_stationary(df, "Value")
 
     df['Year'] = df.Datestamp.dt.year
@@ -55,6 +55,9 @@ def preprocess_frame(df):
     df['Hour'] = df.Datestamp.dt.hour
     # use lowercase for postgresql/timescaledb
     df.columns = [x.lower() for x in df.columns]
+
+    # df["Normalised"] = normalise_data(df.Close)
+    df["normalised"] = (df.close - df.close.mean()) / df.close.std()
     return df
 
 
