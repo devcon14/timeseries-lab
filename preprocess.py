@@ -1,3 +1,4 @@
+import datetime
 import pandas as pd
 DATAFOLDER = "data"
 
@@ -31,6 +32,12 @@ def preprocess_frame(df):
     # df[DATE_COLUMN] = pd.to_datetime(df[DATE_COLUMN])
     df["Datestamp"] = pd.to_datetime(df[DATE_COLUMN])
     # df = df.set_index(DATE_COLUMN)
+
+    # cryptodatadownload CDD: Timestamps are UTC timezone
+    # make all source data UTC, convert to localtime here
+    # df["Datestamp"] = df["Datestamp"].dt.tz_localize('utc').dt.tz_convert("Africa/Johannesburg")
+    df["Datestamp"] = df["Datestamp"] + datetime.timedelta(hours=2)
+
     # ensure dates in ascending order, oldest first
     df = df.sort_values(by="Datestamp", ascending=True)
 
@@ -62,7 +69,7 @@ def preprocess_frame(df):
 
 
 def load_frame():
-    df = pd.read_csv("dataset.csv")
+    df = pd.read_csv("dataset.csv", parse_dates=["datestamp"])
     df.index = pd.DatetimeIndex(df.datestamp)
     df.index.name = "datestampindex"
     return df

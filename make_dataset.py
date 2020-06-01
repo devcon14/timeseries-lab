@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 import pandas as pd
 # import seaborn as sns
@@ -14,7 +15,6 @@ def get_btc(timeframe="hourly"):
         # df["Date"] = df["date"]
         df = df.rename(columns={"date": "Date"})
 
-    # cryptodatadownload, timestamps are UTC timezone
     # timeframe = "daily"
     # timeframe = "hourly"
     if timeframe == "hourly":
@@ -111,7 +111,10 @@ def compile_dataset(dataset):
         df = get_quandl(dataset)
 
     from preprocess import preprocess_frame
+    # print (df[["Date"]].head())
     df = preprocess_frame(df)
+    # print (df[["date", "datestamp"]].head())
+
     # df.to_csv("DATASET.CSV")
     df.to_csv("dataset.csv", index=False)
 
@@ -139,6 +142,7 @@ def compile_old(SOURCE):
         df = get_oil()
     from preprocess import preprocess_frame
     df = preprocess_frame(df)
+
     '''
     # preprocess
     df["Date"] = pd.to_datetime(df.Date)
@@ -166,6 +170,6 @@ if __name__ == "__main__":
     # compile_dataset("CHRIS/CME_SP1")
     # compile_dataset("MULTPL/SP500_REAL_PRICE_MONTH")
     # compile_dataset("bytetree_1d_bitcoin.csv")
-    # compile_dataset("Bitstamp_BTCUSD_1h.csv")
-    compile_dataset("BCB/UDJIAD1")
+    compile_dataset("Bitstamp_BTCUSD_1h.csv")
+    # compile_dataset("BCB/UDJIAD1")
     # compile_dataset("CDD Bitstamp Hourly")
