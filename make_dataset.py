@@ -109,6 +109,10 @@ def compile_dataset(dataset):
         df = get_quandl(dataset)
     elif "BCB" in dataset:
         df = get_quandl(dataset)
+    elif "DB" in dataset:
+        print ("load csv")
+        df = pd.read_csv("/d1/code/python/backtrade/data/bitmex_btcusd-perpetual-futures_1min.csv", parse_dates=["Date"])
+        print (df)
 
     from preprocess import preprocess_frame
     # print (df[["Date"]].head())
@@ -169,7 +173,12 @@ if __name__ == "__main__":
     # compile_dataset("sp500-10-year-daily-chart.csv")
     # compile_dataset("CHRIS/CME_SP1")
     # compile_dataset("MULTPL/SP500_REAL_PRICE_MONTH")
-    # compile_dataset("bytetree_1d_bitcoin.csv")
-    compile_dataset("Bitstamp_BTCUSD_1h.csv")
     # compile_dataset("BCB/UDJIAD1")
     # compile_dataset("CDD Bitstamp Hourly")
+
+    compile_dataset("bytetree_1d_bitcoin.csv")
+    # compile_dataset("Bitstamp_BTCUSD_d.csv")
+    # compile_dataset("Bitstamp_BTCUSD_1h.csv")
+
+    # 1 minute csv
+    # compile_dataset("DB/bitmex_perpetual")
