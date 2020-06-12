@@ -84,6 +84,7 @@ def get_quandl(name):
 
 # or prep_dataset
 def compile_dataset(dataset):
+    resolution = None
     # hardcode some macrotrends.net
     if dataset == "sp500-10-year-daily-chart.csv":
         df = pd.read_csv(f"{DATAFOLDER}/macrotrends/" + dataset, skiprows=15)
@@ -93,16 +94,20 @@ def compile_dataset(dataset):
         # df = pd.read_csv("bytetree_1d_bitcoin.csv")
         # df = pd.read_csv("bitcoin.csv")
         # time, t1v|d1v (first Spend|USD), hgt (block height), dif (difficulty), gen (coins generated)
-        # txv (transaction value)
+        # txv (transaction value usd), gen (new coins generated)
         df = df.rename(columns={"date": "Date", "dpr": "Close"})
+        resolution = "D"
     elif dataset == "bytetree_1h_bitcoin.csv":
         df = pd.read_csv(f"{DATAFOLDER}/" + dataset)
         df["Date"] = pd.to_datetime(df.date + ' ' + df.time)
         df = df.rename(columns={"dpr": "Close"})
+        resolution = "H"
     elif dataset == "Bitstamp_BTCUSD_1h.csv":
         df = get_btc("hourly")
+        resolution = "H"
     elif dataset == "Bitstamp_BTCUSD_d.csv":
         df = get_btc("daily")
+        resolution = "D"
     elif "CHRIS" in dataset:
         df = get_quandl(dataset)
     elif "MULTPL" in dataset:
@@ -113,10 +118,13 @@ def compile_dataset(dataset):
         print ("load csv")
         df = pd.read_csv("/d1/code/python/backtrade/data/bitmex_btcusd-perpetual-futures_1min.csv", parse_dates=["Date"])
         print (df)
+    elif "ccxt" in dataset:
+        # ccxt timestamp is UTC
+        df = pd.read_csv(f"data/{dataset}.csv", parse_dates=["Date"])
 
     from preprocess import preprocess_frame
     # print (df[["Date"]].head())
-    df = preprocess_frame(df)
+    df = preprocess_frame(df, resolution)
     # print (df[["date", "datestamp"]].head())
 
     # df.to_csv("DATASET.CSV")
@@ -176,9 +184,11 @@ if __name__ == "__main__":
     # compile_dataset("BCB/UDJIAD1")
     # compile_dataset("CDD Bitstamp Hourly")
 
-    compile_dataset("bytetree_1d_bitcoin.csv")
+    compile_dataset("bytetree_1h_bitcoin.csv")
+    # compile_dataset("bytetree_1d_bitcoin.csv")
     # compile_dataset("Bitstamp_BTCUSD_d.csv")
     # compile_dataset("Bitstamp_BTCUSD_1h.csv")
 
+    # compile_dataset("ccxt_binance_1m")
     # 1 minute csv
     # compile_dataset("DB/bitmex_perpetual")

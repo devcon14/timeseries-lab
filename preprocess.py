@@ -25,7 +25,7 @@ def add_stationary(df, col):
     df["Stationary"] = df["Logx"] - df["Logx"].shift(1)
     del df["Logx"]
 
-def preprocess_frame(df):
+def preprocess_frame(df, resolution=None):
     # DATE_COLUMN = "date"
     DATE_COLUMN = "Date"
 
@@ -40,6 +40,15 @@ def preprocess_frame(df):
 
     # ensure dates in ascending order, oldest first
     df = df.sort_values(by="Datestamp", ascending=True)
+
+    if resolution:
+        # testing, fill gaps
+        # detect df.index.resolution?
+        df.index = pd.to_datetime(df.Datestamp)
+        df_dr = pd.DataFrame(index=pd.date_range(df.Datestamp.min(), df.Datestamp.max(), freq=resolution))
+        df = df_dr.merge(df, how="left", left_index=True, right_index=True)
+        df["Datestamp"] = df.index
+        df["Close"] = df["Close"].fillna(method="pad")
 
     if "High" in df.columns:
         df["Range"] = df.High - df.Low
